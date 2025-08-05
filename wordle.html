@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport> content="width=device-width, initial-scale=1.0">
+	<title>Legally Distinct Guess a Five Character Word i nSix Guesses Game</title>
+	<h1 class="title">Legally Distinct Guess a Five Character Word in Six Guesses Game</h1>
+</head>
+<body class="body">
+<style>
+.body {
+	background-color: black
+}
+.title {
+	color: white
+}
+.dark-mode {
+	color: white
+	width: fit-content
+}
+element.style {
+	font-family:  monospace
+}
+.wrong {
+	color: red
+}
+.contains {
+	color: yellow
+}
+.correct {
+	color: green
+}
+.unguessed {
+	color: lightgray
+}
+div#output {
+	color: white;
+	width: fit-content
+}
+sec#lettersRemaining {
+	color: white
+	width: fit-content
+}
+</style>
+<form>
+    <label for="input"></label>
+    <input type="text" id="data" placeholder="Input Five Character Word" required>
+    <button type="button" onclick="getInput()">Enter</button>
+    <button type="button" onclick="clearInput()">Clear</button>
+    <sec class="dark-mode"><br>Guesses: </sec>
+    <sec id="lettersRemaining"></sec>
+</form>
+<div id="output">
+
+</div>
+<script>
+    let wordList = [
+        "about",
+        "other",
+        "which",
+        "their",
+        "there",
+        "first",
+        "would",
+        "these",
+        "click",
+        "price",
+        "state"
+    ];
+    let attempts = 0;
+    let numCorrect = 0;
+    let wordle = wordList[Math.floor(Math.random() * wordList.length)];
+    console.log(wordle);
+    let wordleDict = {};
+    let letters = "abcdefghijklmnopqrstuvwxyz";
+    let remainingLetters = {};
+    for (i = 0; i < 26; i++){
+        remainingLetters[letters.charAt(i)] = "unguessed";   
+    }
+
+    for (i = 0; i < 5; i++) {
+        if (wordle.charAt(i) in wordleDict){
+            wordleDict[wordle.charAt(i)] += 1;
+        } else {
+            wordleDict[wordle.charAt(i)] = 1;
+        }
+    }
+    let notGuessed = true;
+    dispLetters("", "", "");
+
+    function clearInput(){
+        attempts = 0;
+        document.getElementById("output").innerHTML = "";
+        notGuessed = true;
+        wordle = wordList[Math.floor(Math.random() * wordList.length)];
+        console.log(wordle);
+        wordleDict = {};
+        for (i = 0; i < 5; i++) {
+            if (wordle.charAt(i) in wordleDict) {
+                wordleDict[wordle.charAt(i)] += 1;
+            } else {
+                wordleDict[wordle.charAt(i)] = 1;
+            }
+        }
+        dispLetters("", "", "");
+    }
+
+    function getInput(){
+        event.preventDefault();
+        let data = document.getElementById("data").value.toLowerCase();
+        if (attempts <= 5 && notGuessed) {
+            if (validate(data)) {
+                compare(data);
+                if (numCorrect == 5){
+                    document.getElementById("output").innerHTML += "You guessed the wordle in " + attempts + " attempt(s).";
+                    notGuessed = false;
+                }
+            }
+        } else if (!notGuessed) {
+            alert("Press clear to start new game");
+        } else {
+            alert("Maximum attempts exceeded, press clear to retry with new wordle.");
+        }
+    }
+
+    function validate(word) {
+        if (word.length != 5) return false;
+        return true;
+    }
+
+    function dispLetters(wrong, correct, contains) {
+        for (i = 0; i < wrong.length; i++) {
+            if (remainingLetters[wrong.charAt(i)] == "unguessed") {
+                remainingLetters[wrong.charAt(i)] = "wrong";
+            }
+        }
+        for (i = 0; i < contains.length; i++) {
+            if (remainingLetters[contains.charAt(i)] == "unguessed" || remainingLetters[contains.charAt(i)] == "wrong") {
+                remainingLetters[contains.charAt(i)] = "contains";
+                
+            }
+        }
+
+        for (i = 0; i < correct.length; i++) {
+                remainingLetters[correct.charAt(i)] = "correct";
+        }
+
+        let span2 = "";
+        for (i = 0; i < 26; i++) {
+            if (remainingLetters[letters.charAt(i)] == "unguessed") {
+                span2 += `<span class="unguessed">` + letters.charAt(i) + `</span>`;
+            }
+            if (remainingLetters[letters.charAt(i)] == "contains") {
+                span2 += `<span class="contains">` + letters.charAt(i) + `</span>`;
+            }
+            if (remainingLetters[letters.charAt(i)] == "wrong") {
+                span2 += `<span class="wrong">` + letters.charAt(i) + `</span>`;
+            }
+            if (remainingLetters[letters.charAt(i)] == "correct") {
+                span2 += `<span class="correct">` + letters.charAt(i) + `</span>`;
+            }
+        }
+
+        if (attempts == 0) {
+            span2 = "";
+            for (i = 0; i < 26; i++) {
+                remainingLetters[letters.charAt(i)] == "unguessed";
+                span2 += `<span class="unguessed">` + letters.charAt(i) + `</span>`;
+            }
+        }
+        document.getElementById("lettersRemaining").innerHTML = span2;
+    }
+
+    function compare(word){
+        let span = [5];
+        numCorrect = 0;
+        let wordleDictCopy = {};
+        let wrong = "";
+        let correct = "";
+        let contains = "";
+        for (i = 0; i < 5; i++){
+            if (wordle.charAt(i) in wordleDictCopy){
+                wordleDictCopy[wordle.charAt(i)] += 1;
+            } else {
+                wordleDictCopy[wordle.charAt(i)] = 1;
+            }
+        }
+
+        let wordDict = {};
+        for (i = 0; i < 5; i++) {
+            if(wordle.charAt(i) in wordDict){
+                wordDict[word.charAt(i)] += 1;
+            } else {
+                wordDict[word.charAt(i)] = 1;
+            }
+        }
+
+        for (i = 0; i < 5; i++){
+            if (word.charAt(i) == wordle.charAt(i)) {
+                span[i] = `<span class="correct">` + word.charAt(i) + `</span>`;
+                remainingLetters[word.charAt(i)] = "correct";
+                correct += word.charAt(i);
+                wordleDictCopy[word.charAt(i)] -= 1;
+                numCorrect += 1;
+            }
+        }
+
+        for (i = 0; i < 5; i++) {
+            if (word.charAt(i) != wordle.charAt(i)){
+                if (wordle.includes(word.charAt(i)) && wordleDictCopy[word.charAt(i)] > 0){
+                    span[i] = `<span class="contains">` + word.charAt(i) + `</span>`;
+                    wordleDictCopy[word.charAt(i)] -= 1;
+                    if (remainingLetters[word.charAt(i)] != "correct") {
+                        remainingLetters[word.charAt(i)] = "contains";
+                        contains += word.charAt(i);
+                    }
+                } else {
+                    span[i] = `<span class="wrong">` + word.charAt(i) + `</span>`;
+                    if (remainingLetters[word.charAt(i)] == "unguessed") {
+                        remainingLetters[word.charAt(i)] = "wrong";
+                        wrong += word.charAt(i);
+                    }
+                }
+            }
+        }
+
+        let spanToString = "";
+        span.forEach(letter => {
+            spanToString += letter;
+        });
+        document.getElementById("output").innerHTML += spanToString + "<br>";
+        attempts += 1;
+        dispLetters(wrong, correct, contains);
+    }
+</script>
+</body>
+</html>
